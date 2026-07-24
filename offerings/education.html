@@ -74,6 +74,18 @@
   .rv{ opacity:0; transform:translateY(18px); }
   .rv.in{ animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards; }
   @keyframes rise{ to{ opacity:1; transform:none; } }
+  .promo{ margin-top:1.9rem; width:100%; max-width:560px; }
+  .promo-frame{ position:relative; aspect-ratio:16/9; border:1px solid var(--line2);
+    border-radius:12px; overflow:hidden; background:#0e151c; box-shadow:0 16px 44px rgba(14,21,28,0.16); }
+  .promo-frame video{ width:100%; height:100%; object-fit:cover; display:block; }
+  .promo-play{ position:absolute; inset:0; margin:auto; width:62px; height:62px; border-radius:50%;
+    display:grid; place-items:center; color:#fff; border:none; background:rgba(14,21,28,0.55);
+    -webkit-backdrop-filter:blur(4px); backdrop-filter:blur(4px);
+    transition:transform .25s cubic-bezier(.2,.7,.2,1), background .25s; }
+  .promo-play:hover{ transform:scale(1.08); background:var(--accent); }
+  .promo-play svg{ margin-left:3px; }
+  .promo figcaption{ margin-top:.7rem; font-size:10.5px; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--faint); }
   @media (max-width:820px){
     body{ overflow:auto; }
     main{ padding:12vh 0 8vh; max-width:none; }
@@ -87,6 +99,12 @@
     nav.top{ gap:.85rem; font-size:11px; }
     h1.head{ font-size:clamp(2rem,8.4vw,2.6rem); }
     .links{ gap:1.5rem; }
+  }
+  /* height fallback: the video makes the page taller — scroll & top-align instead of clipping */
+  @media (max-height:1000px){
+    body{ overflow-y:auto; overflow-x:hidden; }
+    .wrap{ height:auto; min-height:100%; }
+    main{ justify-content:flex-start; padding:7vh 0 5vh; }
   }
   @media (prefers-reduced-motion:reduce){ .rv,.rv.in{ animation:none; opacity:1; transform:none; } }
 </style>
@@ -123,6 +141,18 @@
         <p><b>What you get.</b> Examiner-grade marking at scale, with feedback students can act on.</p>
       </div>
 
+      <figure class="promo rv">
+        <div class="promo-frame">
+          <video id="promoV" poster="../assets/education-promo-poster.jpg" preload="metadata" playsinline>
+            <source src="../assets/evaluate-ai-linkedin-promo.mp4" type="video/mp4">
+          </video>
+          <button class="promo-play" id="promoPlay" aria-label="Play the Evaluate AI film" data-h>
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>
+          </button>
+        </div>
+        <figcaption>Evaluate AI — examiner-grade marking, in motion · 0:25</figcaption>
+      </figure>
+
       <div class="links rv">
         <a class="lk" href="mailto:connect@svaiva.com?subject=Education%20enquiry" data-h>Reach out <span class="arw">→</span></a>
         <a class="lk ghost" href="../index.html" data-h>All offerings <span class="arw">→</span></a>
@@ -139,6 +169,8 @@
 <script>
 const $=s=>document.querySelector(s);
 document.querySelectorAll(".rv").forEach((n,i)=>{ setTimeout(()=>n.classList.add("in"), 120+i*90); });
+(function(){ var v=document.getElementById("promoV"), b=document.getElementById("promoPlay");
+  if(v&&b){ b.addEventListener("click",function(){ v.setAttribute("controls",""); b.style.display="none"; v.play(); }); } })();
 const cursor=$("#cursor");
 let mx=innerWidth/2, my=innerHeight/2, cxp=mx, cyp=my;
 addEventListener("mousemove",e=>{ mx=e.clientX; my=e.clientY; });
