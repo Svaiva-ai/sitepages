@@ -127,6 +127,13 @@
     .bar{ grid-template-columns:repeat(2,minmax(0,1fr)); }
     .links{ gap:1.4rem; }
   }
+  /* height fallback: when the viewport is too short (e.g. browser zoom),
+     let the locked screen scroll & top-align instead of clipping the headline */
+  @media (max-height:860px){
+    body{ overflow-y:auto; overflow-x:hidden; }
+    .wrap{ height:auto; min-height:100%; }
+    main{ justify-content:flex-start; padding:6vh 0 4vh; }
+  }
   @media (prefers-reduced-motion: reduce){
     .off{ transition:background .2s, border-color .2s; }
     .off:hover{ transform:none; }
