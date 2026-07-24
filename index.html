@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Svaiva · Digital reflections of your business</title>
+<style>
+  /* ================= FONTS ================= */
+  @font-face{ font-family:"Hanken Grotesk"; font-style:normal; font-weight:400 800;
+    font-display:swap; src:url("./design-system/fonts/hanken-grotesk.woff2") format("woff2"); }
+  @font-face{ font-family:"Fraunces"; font-style:italic; font-weight:300 700;
+    font-display:swap; src:url("./design-system/fonts/fraunces-italic.woff2") format("woff2"); }
+
+  /* ================= TOKENS ================= */
+  :root{
+    --paper:#e0e9f0;        /* icy frost — cooler */
+    --ink:#0e151c;          /* cold near-black */
+    --mute:#68727d;         /* cold secondary */
+    --faint:#a3aeb8;        /* cold tertiary */
+    --line:rgba(14,21,28,0.11);
+    --accent:#2c86a6;       /* ice blue, used sparingly */
+    --grot:"Hanken Grotesk", system-ui, -apple-system, sans-serif;
+    --serif:"Fraunces", Georgia, serif;
+    --gut:clamp(20px,5vw,72px);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ height:100%; }
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:var(--grot); font-weight:400;
+    overflow:hidden; -webkit-font-smoothing:antialiased;
+  }
+  @media (hover:hover) and (pointer:fine){ body{ cursor:none; } a,button{ cursor:none; } }
+
+  /* ================= CANVAS BG ================= */
+  #bg{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+  /* ================= CURSOR ================= */
+  .cursor{ position:fixed; top:0; left:0; width:14px; height:14px; border-radius:50%;
+    background:var(--ink); z-index:9999; pointer-events:none;
+    transform:translate(-50%,-50%); transition:width .22s cubic-bezier(.2,.7,.2,1),
+    height .22s cubic-bezier(.2,.7,.2,1), background .22s, border-color .22s; mix-blend-mode:normal; }
+  .cursor.grow{ width:68px; height:68px; background:transparent; border:1px solid var(--ink); }
+  @media (hover:none),(pointer:coarse){ .cursor{ display:none; } }
+
+  /* ================= LAYOUT ================= */
+  .wrap{ position:relative; z-index:5; height:100%; display:flex; flex-direction:column;
+    padding:0 var(--gut); }
+
+  header{ display:flex; align-items:center; justify-content:space-between; height:74px;
+    font-size:12.5px; }
+  .brand{ font-weight:600; letter-spacing:-0.01em; font-size:16px; display:flex; align-items:baseline; gap:2px;}
+  .brand sup{ color:var(--accent); font-size:9px; }
+  .meta{ color:var(--mute); letter-spacing:0.14em; text-transform:uppercase; font-size:10.5px; }
+  nav.top{ display:flex; gap:1.8rem; }
+  nav.top a{ color:var(--ink); text-decoration:none; position:relative; }
+  nav.top a::after{ content:""; position:absolute; left:0; right:100%; bottom:-3px; height:1px;
+    background:var(--accent); transition:right .3s cubic-bezier(.2,.7,.2,1); }
+  nav.top a:hover::after{ right:0; }
+
+  main{ flex:1; display:flex; flex-direction:column; justify-content:center; min-height:0;
+    max-width:1150px; }
+  .kicker{ display:flex; align-items:center; gap:.8rem; font-size:11px; letter-spacing:0.2em;
+    text-transform:uppercase; color:var(--mute); margin-bottom:1.6rem; }
+  .kicker .n{ color:var(--ink); }
+  .kicker .ln{ width:38px; height:1px; background:var(--ink); opacity:.35; }
+
+  h1.head{ font-family:var(--grot); font-weight:750; font-size:clamp(2.5rem,6.6vw,5.9rem);
+    line-height:0.98; letter-spacing:-0.028em; max-width:15ch; }
+  h1.head em{ font-family:var(--serif); font-style:italic; font-weight:400; letter-spacing:-0.01em; }
+  .head-wrap{ overflow:hidden; }
+  .sub{ margin-top:1.7rem; font-size:clamp(1.02rem,1.5vw,1.25rem); line-height:1.5;
+    color:#434d56; max-width:44ch; font-weight:420; }
+
+  .links{ display:flex; gap:2.4rem; margin-top:2.6rem; font-size:14px; }
+  .lk{ color:var(--ink); text-decoration:none; position:relative; padding-bottom:4px; font-weight:500; }
+  .lk .arw{ display:inline-block; transition:transform .25s cubic-bezier(.2,.7,.2,1); }
+  .lk:hover .arw{ transform:translateX(6px); }
+  .lk::after{ content:""; position:absolute; left:0; bottom:0; width:100%; height:1px;
+    background:var(--ink); transform:scaleX(1); transform-origin:left; transition:transform .3s; }
+  .lk.ghost::after{ background:var(--faint); }
+
+  /* ================= OFFERINGS BAR ================= */
+  .bar{ display:grid; grid-template-columns:repeat(6,1fr); gap:8px; border-top:1px solid rgba(14,21,28,0.20);
+    padding-top:16px; margin-bottom:26px; }
+  /* frosted chips: lift each title off the orb so numbers stay legible + read as tappable */
+  .off{ position:relative; background:rgba(224,233,240,0.66); backdrop-filter:blur(3px);
+    -webkit-backdrop-filter:blur(3px); border:1px solid var(--line); border-radius:10px; text-align:left;
+    padding:14px 16px 12px; display:flex; flex-direction:column; gap:6px; color:var(--mute);
+    font-family:var(--grot); transition:background .2s, border-color .2s, transform .2s; }
+  .off:hover{ background:rgba(224,233,240,0.94); border-color:rgba(14,21,28,0.22); transform:translateY(-2px); }
+  .off .oi{ font-size:10.5px; letter-spacing:0.16em; color:var(--mute); }
+  .off .on{ font-size:16px; font-weight:600; letter-spacing:-0.01em; color:var(--ink); transition:.2s; }
+  .off:hover .oi{ color:var(--accent); }
+  .off.sel{ background:rgba(224,233,240,0.97); border-color:var(--accent); }
+  .off.sel .on{ font-family:var(--serif); font-style:italic; font-weight:400; color:var(--ink); font-size:19px; }
+  .off.sel .oi{ color:var(--accent); }
+  .off .prog{ height:2px; background:var(--accent); width:0; margin-top:6px; transition:width .3s cubic-bezier(.2,.7,.2,1); }
+  .off.sel .prog{ width:26px; }
+
+  .foot{ display:flex; justify-content:space-between; height:30px; align-items:center;
+    font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--faint);
+    border-top:1px solid var(--line); }
+
+  /* reveal anim */
+  .rv{ opacity:0; transform:translateY(18px); }
+  .rv.in{ animation:rise .6s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+
+  @media (max-width:820px){
+    body{ overflow:auto; }
+    .meta{ display:none; }
+    main{ padding:10vh 0 4vh; }
+    #bg{ opacity:0.16; }
+    .bar{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+    nav.top{ gap:1rem; font-size:12px; }
+    .sub{ max-width:none; }
+  }
+  @media (max-width:560px){
+    #bg{ display:none; }
+    nav.top{ gap:.85rem; font-size:11px; }
+    h1.head{ font-size:clamp(2rem,8.4vw,2.7rem); }
+    .bar{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+    .links{ gap:1.4rem; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .off{ transition:background .2s, border-color .2s; }
+    .off:hover{ transform:none; }
+    .rv, .rv.in{ animation:none; opacity:1; transform:none; }
+  }
+</style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="cursor" id="cursor"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="brand" id="brand" data-h>Svaiva<sup>®</sup></div>
+      <div class="meta" id="meta">MUMBAI · 00:00 IST · DIGITAL REFLECTIONS</div>
+      <nav class="top"><a href="#" data-h>Offerings</a><a href="approach.html" data-h>Approach</a><a href="mailto:connect@svaiva.com" data-h>Contact</a></nav>
+    </header>
+
+    <main>
+      <div class="kicker rv"><span class="n" id="kn"></span><span class="ln"></span><span id="kt">INDIA'S FIRST AI-NATIVE CONSULTING FIRM</span></div>
+      <div class="head-wrap"><h1 class="head rv" id="head">Not advice. A working <em>reflection</em> of your business.</h1></div>
+      <p class="sub rv" id="sub">Svaiva builds systems that think, decide, and act the way you would. Outcomes you can measure, shipped in 15-day sprints.</p>
+      <div class="links rv">
+        <a class="lk" href="mailto:connect@svaiva.com?subject=Book%20a%20sprint" data-h id="cta">Book a sprint <span class="arw">→</span></a>
+        <a class="lk ghost" href="approach.html" data-h id="cta2">See the approach <span class="arw">→</span></a>
+      </div>
+    </main>
+
+    <nav class="bar" id="bar" aria-label="Offerings"></nav>
+    <div class="foot">
+      <span>SVAIVA / DIGITAL REFLECTIONS</span>
+      <span id="fr">SIX OFFERINGS · USE ← → OR 1–6</span>
+    </div>
+  </div>
+
+<script>
+/* ============ CONTENT ============ */
+const BRAND={
+  t:"INDIA'S FIRST AI-NATIVE CONSULTING FIRM",
+  head:'Not advice. A working <em>reflection</em> of your business.',
+  sub:"Svaiva builds systems that think, decide, and act the way you would. Outcomes you can measure, shipped in 15-day sprints.",
+  cta:"Book a sprint", href:"mailto:connect@svaiva.com?subject=Book%20a%20sprint",
+  fr:"SIX OFFERINGS · USE ← → OR 1–6",
+};
+const MAILTO="mailto:connect@svaiva.com?subject=Book%20a%20sprint";
+const DATA=[
+  {name:"BRAINs",    t:"BRAINS",          head:'Your best thinking, kept <em>in-house</em>.',   sub:"We turn how your top people reason into a private brain your firm owns. The judgment stays when they leave.", cta:"See BRAINs", href:"offerings/brains.html"},
+  {name:"Recall",    t:"RECALL",          head:'Every answer, with a <em>source</em>.',          sub:"One place to ask across everything your firm knows. Cited answers you can trust, accuracy first.", cta:"See Recall", href:"offerings/recall.html"},
+  {name:"AI-Native", t:"AI-NATIVE BUILD", head:'Rebuild the process, <em>in parallel</em>.',     sub:"We build your AI-native alternative alongside the current one, so nothing stops while the better version comes up.", cta:"See the build", href:"offerings/ai-native.html"},
+  {name:"Training",  t:"TRAINING",        head:'Your team, <em>fluent</em>.',                    sub:"Role-specific programs for finance, ops, and consulting. Measured on what changes in practice, not attendance.", cta:"Design a program", href:"offerings/training.html"},
+  {name:"Succession",t:"SUCCESSION",      head:'Know-how that <em>stays</em>.',                  sub:"A transfer engine that captures what each person knows and forces it into practice before they leave.", cta:"See Succession", href:"offerings/succession.html"},
+  {name:"Education", t:"EDUCATION",       head:'Examiner-grade <em>marking</em>, at scale.',     sub:"Answer sheets scored with gates, marked-up scripts, and coaching. Consistent, fast, and fair.", cta:"See it work", href:"offerings/education.html"},
+];
+
+const $=s=>document.querySelector(s);
+const bar=$("#bar");
+let cur=-1;
+
+DATA.forEach((d,i)=>{
+  const b=document.createElement("button");
+  b.className="off"; b.setAttribute("data-h","");
+  b.innerHTML=`<span class="oi">0${i+1}</span><span class="on">${d.name}</span><span class="prog"></span>`;
+  b.addEventListener("click",()=>select(i));
+  bar.appendChild(b);
+});
+
+const els={ kn:$("#kn"), kt:$("#kt"), head:$("#head"), sub:$("#sub"), cta:$("#cta"), cta2:$("#cta2"), fr:$("#fr") };
+function select(i){
+  if(i===cur) return; cur=i; const d=DATA[i];
+  [...bar.children].forEach((b,k)=>b.classList.toggle("sel",k===i));
+  els.kn.textContent="0"+(i+1);
+  reveal(els.kt, ()=>els.kt.textContent=d.t);
+  reveal(els.head, ()=>els.head.innerHTML=d.head);
+  reveal(els.sub, ()=>els.sub.textContent=d.sub);
+  els.cta.firstChild.textContent=d.cta+" ";
+  els.cta.setAttribute("href", d.href||"#");
+  els.cta2.firstChild.textContent="Book a sprint ";
+  els.cta2.setAttribute("href", MAILTO);
+  els.fr.textContent=`0${i+1} · 06 · ${d.t} · USE ← → OR 1–6`;
+}
+function showBrand(){
+  if(cur===-1) return; cur=-1;
+  [...bar.children].forEach(b=>b.classList.remove("sel"));
+  els.kn.textContent="";
+  reveal(els.kt, ()=>els.kt.textContent=BRAND.t);
+  reveal(els.head, ()=>els.head.innerHTML=BRAND.head);
+  reveal(els.sub, ()=>els.sub.textContent=BRAND.sub);
+  els.cta.firstChild.textContent=BRAND.cta+" ";
+  els.cta.setAttribute("href", BRAND.href||"#");
+  els.cta2.firstChild.textContent="See the approach ";
+  els.cta2.setAttribute("href", "approach.html");
+  els.fr.textContent=BRAND.fr;
+}
+$("#brand").addEventListener("click",showBrand);
+function reveal(node,set){
+  node.classList.remove("in"); node.classList.add("rv");
+  void node.offsetWidth; set(); node.classList.add("in");
+}
+// initial reveal
+document.querySelectorAll(".rv").forEach((n,i)=>{ setTimeout(()=>n.classList.add("in"), 120+i*90); });
+
+/* ============ CLOCK ============ */
+function clock(){
+  const n=new Date(); const p=x=>String(x).padStart(2,"0");
+  // IST = UTC+5:30
+  const utc=n.getTime()+n.getTimezoneOffset()*60000; const ist=new Date(utc+3600000*5.5);
+  $("#meta").textContent=`MUMBAI · ${p(ist.getHours())}:${p(ist.getMinutes())} IST · DIGITAL REFLECTIONS`;
+}
+setInterval(clock,10000); clock();
+
+/* ============ KEYBOARD ============ */
+addEventListener("keydown",e=>{
+  if(e.key==="ArrowRight") select(cur>=5?0:cur+1);
+  else if(e.key==="ArrowLeft") select(cur<=0?5:cur-1);
+  else if(/^[1-6]$/.test(e.key)) select(+e.key-1);
+  else if(e.key==="Escape") showBrand();
+});
+
+/* ============ CURSOR ============ */
+const cursor=$("#cursor");
+let mx=innerWidth/2, my=innerHeight/2, cxp=mx, cyp=my;
+addEventListener("mousemove",e=>{ mx=e.clientX; my=e.clientY; });
+document.querySelectorAll("[data-h]").forEach(el=>{
+  el.addEventListener("mouseenter",()=>cursor.classList.add("grow"));
+  el.addEventListener("mouseleave",()=>cursor.classList.remove("grow"));
+});
+(function loop(){ cxp+=(mx-cxp)*0.2; cyp+=(my-cyp)*0.2;
+  cursor.style.transform=`translate(${cxp-7}px,${cyp-7}px)`; requestAnimationFrame(loop); })();
+
+/* ============ ASCII ORB / GLOBE BACKGROUND ============ */
+/* a lit sphere on the right: surface spins in 3D (fixed light), tilts to the
+   mouse, and slides away when the pointer runs over it — springing back. */
+const cv=$("#bg"), ctx=cv.getContext("2d");
+const RAMP=[" ","-","−","=","+","<",">","1","×","÷","%","0","√","$","¥","£","€","∑","∞","₹"];
+const FONT_PX=13; let CW, CH, cols, rows, W, H, dpr;
+function setup(){
+  dpr=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight;
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+"px"; cv.style.height=H+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.font=`${FONT_PX}px ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace`;
+  ctx.textBaseline="top";
+  CW=ctx.measureText("0").width||7.8; CH=Math.round(FONT_PX*1.16);
+  cols=Math.ceil(W/CW)+1; rows=Math.ceil(H/CH)+1;
+}
+setup(); addEventListener("resize",setup);
+
+function hash(a,b,c){ let h=(a*374761393+b*668265263+c*362437)>>>0; h=(h^(h>>13))*1274126177>>>0; return (h>>>0)/4294967296; }
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+// fixed key light (view space) — terminator stays put while the surface turns
+const L=(()=>{ const v=[-0.55,-0.68,0.49]; const m=Math.hypot(...v); return v.map(x=>x/m); })();
+
+// orb turns in place; the symbols inside scatter from the cursor (the orb itself doesn't chase it)
+let frame=0, last=0;
+
+function draw(ts){
+  requestAnimationFrame(draw);
+  if(ts-last<50) return; last=ts; frame++;
+  ctx.clearRect(0,0,W,H);
+
+  /* ruled lines + centre guide */
+  ctx.strokeStyle="rgba(16,24,32,0.045)"; ctx.lineWidth=1;
+  for(let y=Math.round(CH*2)+0.5; y<H; y+=CH*2){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  ctx.strokeStyle="rgba(16,24,32,0.06)";
+  const gx=Math.round(W*0.5)+0.5; ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke();
+
+  const R=Math.min(W,H)*0.46;
+
+  /* orb centre — anchored on the right, only a slow idle float (no cursor chase) */
+  const cx = W*0.74 + Math.sin(ts*0.00040)*W*0.006;
+  const cy = H*0.50 + Math.cos(ts*0.00033)*H*0.010;
+
+  /* pointer scatter — each symbol shoves away from the cursor, leaving a clear wake */
+  const rad=R*0.52, rad2=rad*rad, MAXO=60;
+
+  /* 3D spin: yaw turns the surface under the fixed light; mouse-Y tilts the axis */
+  const yaw=ts*0.00019;
+  const pitch=clamp((my-H/2)/H*0.9, -0.7, 0.7) + 0.12;
+  const cosY=Math.cos(yaw), sinY=Math.sin(yaw), cosP=Math.cos(pitch), sinP=Math.sin(pitch);
+  const N=RAMP.length;
+
+  for(let r=0;r<rows;r++){
+    const y=r*CH; const pcy=y+CH/2;
+    for(let c=0;c<cols;c++){
+      const x=c*CW; const pcx=x+CW/2;
+      const dx=(pcx-cx)/R, dy=(pcy-cy)/R; const r2=dx*dx+dy*dy;
+      let ch=null, alpha=0, ice=false;
+      if(r2<=1){
+        const z=Math.sqrt(1-r2);
+        /* view-space Lambert — the lit crescent stays fixed */
+        let b=dx*L[0]+dy*L[1]+z*L[2]; b=Math.max(0,b); b=0.10+0.80*b;
+        /* rotate the view point into object space -> texture that spins */
+        let ox=dx*cosY - z*sinY, oz=dx*sinY + z*cosY, oy=dy;
+        const oy2=oy*cosP - oz*sinP; oz=oy*sinP + oz*cosP; oy=oy2;
+        const lon=Math.atan2(ox,oz), lat=Math.asin(clamp(oy,-1,1));
+        /* soft bands sweep across as it turns */
+        b*=0.74 + 0.26*(0.5+0.5*Math.sin(lon*7 + lat*1.5));
+        /* faint lat/long wires -> globe read */
+        const wire=Math.pow(Math.abs(Math.sin(lon*8)),26)*0.5 + Math.pow(Math.abs(Math.sin(lat*6)),26)*0.4;
+        b+=wire*0.22;
+        b+=(hash(c,r,frame)-0.5)*0.05;                   // shimmer
+        b=Math.min(1,Math.max(0,b));
+        const idx=Math.min(N-1,Math.max(0,Math.round((1-b)*(N-1))));
+        ch=RAMP[idx];
+        if(ch!==" "){ alpha=0.13+0.34*(idx/(N-1)); ice=idx>N*0.72; }
+      } else {
+        // sparse field outside
+        if(hash(c,r,(frame>>2))<0.010){ ch=RAMP[2+((c+r)%5)]; alpha=0.055; }
+      }
+      if(ch && ch!==" "){
+        /* displace this glyph away from the pointer */
+        let dX=x, dY=y;
+        const sx=pcx-mx, sy=pcy-my, s2=sx*sx+sy*sy;
+        if(s2<rad2){ const s=Math.sqrt(s2), f=1-s/rad, off=f*f*MAXO, inv=1/(s||1);
+          dX+=sx*inv*off; dY+=sy*inv*off; }
+        ctx.fillStyle = ice ? `rgba(44,118,148,${alpha})` : `rgba(9,15,21,${alpha})`;
+        ctx.fillText(ch,dX,dY);
+      }
+    }
+  }
+}
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>

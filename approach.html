@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Approach · Svaiva</title>
+<meta name="description" content="How Svaiva works — AI-native systems built and shipped in 15-day sprints, measured on outcomes. Built by finance insiders." />
+<style>
+  /* ================= FONTS ================= */
+  @font-face{ font-family:"Hanken Grotesk"; font-style:normal; font-weight:400 800;
+    font-display:swap; src:url("./design-system/fonts/hanken-grotesk.woff2") format("woff2"); }
+  @font-face{ font-family:"Fraunces"; font-style:italic; font-weight:300 700;
+    font-display:swap; src:url("./design-system/fonts/fraunces-italic.woff2") format("woff2"); }
+
+  /* ================= TOKENS ================= */
+  :root{
+    --paper:#e0e9f0; --panel:#eaf1f6; --ink:#0e151c; --mute:#68727d; --faint:#a3aeb8;
+    --line:rgba(14,21,28,0.11); --line2:rgba(14,21,28,0.20); --accent:#2c86a6;
+    --grot:"Hanken Grotesk", system-ui, -apple-system, sans-serif;
+    --serif:"Fraunces", Georgia, serif; --gut:clamp(20px,5vw,72px);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--paper); color:var(--ink); font-family:var(--grot); font-weight:400;
+    line-height:1.6; -webkit-font-smoothing:antialiased; }
+  @media (hover:hover) and (pointer:fine){ body{ cursor:none; } a,button{ cursor:none; } }
+
+  /* orb behind, scrim over its left so the reading column stays legible */
+  #bg{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+  #scrim{ position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:linear-gradient(90deg, var(--paper) 0%, var(--paper) 38%, rgba(224,233,240,0) 68%); }
+
+  .cursor{ position:fixed; top:0; left:0; width:14px; height:14px; border-radius:50%;
+    background:var(--ink); z-index:9999; pointer-events:none; transform:translate(-50%,-50%);
+    transition:width .22s cubic-bezier(.2,.7,.2,1), height .22s cubic-bezier(.2,.7,.2,1), background .22s, border-color .22s; }
+  .cursor.grow{ width:64px; height:64px; background:transparent; border:1px solid var(--ink); }
+  @media (hover:none),(pointer:coarse){ .cursor{ display:none; } }
+
+  header{ position:sticky; top:0; z-index:50; display:flex; align-items:center;
+    justify-content:space-between; height:64px; padding:0 var(--gut);
+    background:color-mix(in srgb, var(--paper) 82%, transparent);
+    backdrop-filter:saturate(1.2) blur(10px); border-bottom:1px solid var(--line); font-size:12.5px; }
+  .brand{ font-weight:600; letter-spacing:-0.01em; font-size:16px; display:flex; align-items:baseline; gap:2px;
+    color:var(--ink); text-decoration:none; }
+  .brand sup{ color:var(--accent); font-size:9px; }
+  nav.top{ display:flex; gap:1.7rem; }
+  nav.top a{ color:var(--ink); text-decoration:none; position:relative; font-size:13px; }
+  nav.top a::after{ content:""; position:absolute; left:0; right:100%; bottom:-4px; height:1px;
+    background:var(--accent); transition:right .3s cubic-bezier(.2,.7,.2,1); }
+  nav.top a:hover::after{ right:0; }
+
+  /* single left-aligned reading column */
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 var(--gut); position:relative; z-index:5; }
+  .block{ max-width:600px; padding:8vh 0; }
+  .block.hero{ min-height:84vh; display:flex; flex-direction:column; justify-content:center; padding-bottom:5vh; }
+  .block + .block{ border-top:1px solid var(--line); }
+
+  .label{ display:flex; align-items:center; gap:.7rem; font-size:11px; letter-spacing:0.2em;
+    text-transform:uppercase; color:var(--mute); margin-bottom:1.4rem; }
+  .label .ln{ width:30px; height:1px; background:var(--accent); opacity:.55; }
+  .label span:last-child{ color:var(--accent); font-weight:600; }
+
+  h1.head{ font-family:var(--grot); font-weight:750; font-size:clamp(2.4rem,5.4vw,4.3rem);
+    line-height:1.0; letter-spacing:-0.03em; }
+  h2{ font-family:var(--grot); font-weight:720; font-size:clamp(1.7rem,3.4vw,2.7rem);
+    line-height:1.06; letter-spacing:-0.022em; }
+  h1 em, h2 em{ font-family:var(--serif); font-style:italic; font-weight:400; letter-spacing:-0.01em; }
+  p.sub{ font-size:clamp(1.05rem,1.4vw,1.24rem); color:#3c4650; margin-top:1.4rem; max-width:46ch; }
+  p.body{ font-size:1.06rem; color:#434d56; margin-top:1.1rem; max-width:48ch; }
+
+  .cta-row{ display:flex; gap:2rem; margin-top:2.1rem; flex-wrap:wrap; font-size:14.5px; }
+  .lk{ color:var(--ink); text-decoration:none; position:relative; padding-bottom:4px; font-weight:550; }
+  .lk .arw{ display:inline-block; transition:transform .25s cubic-bezier(.2,.7,.2,1); }
+  .lk:hover .arw{ transform:translateX(6px); }
+  .lk::after{ content:""; position:absolute; left:0; bottom:0; width:100%; height:1px;
+    background:var(--ink); transform:scaleX(1); transform-origin:left; transition:transform .3s; }
+  .lk.ghost{ color:var(--mute); } .lk.ghost::after{ background:var(--faint); }
+
+  .lines{ margin-top:1.7rem; display:grid; gap:1.15rem; }
+  .ln-item{ display:grid; grid-template-columns:auto 1fr; gap:.9rem; align-items:start; }
+  .ln-item .k{ font-family:var(--serif); font-style:italic; font-size:1.2rem; color:var(--accent); line-height:1.2; }
+  .ln-item p{ font-size:1rem; color:#434d56; }
+  .ln-item b{ color:var(--ink); font-weight:620; }
+
+  .who{ margin-top:1.8rem; display:grid; gap:1.1rem; max-width:560px; }
+  .card{ padding:18px 20px; background:color-mix(in srgb,var(--panel) 90%, transparent);
+    border-left:2px solid var(--accent); border-radius:3px; }
+  .card .nm{ font-weight:650; letter-spacing:-0.01em; color:var(--ink); }
+  .card .nm span{ color:var(--mute); font-weight:450; }
+  .card p{ font-size:0.98rem; color:#3c4650; margin-top:.45rem; }
+
+  .block.close{ min-height:72vh; display:flex; flex-direction:column; justify-content:center; }
+  .block.close h2{ max-width:15ch; }
+
+  footer{ border-top:1px solid var(--line2); padding:26px var(--gut) 40px; position:relative; z-index:5; background:var(--paper); }
+  .foot-in{ max-width:1180px; margin:0 auto; display:flex; justify-content:space-between;
+    align-items:center; flex-wrap:wrap; gap:1rem; font-size:12.5px; }
+  .foot-in a{ color:var(--ink); text-decoration:none; }
+  .foot-in a:hover{ color:var(--accent); }
+  .foot-in .muted{ color:var(--faint); letter-spacing:0.14em; text-transform:uppercase; font-size:10.5px; }
+
+  .rv{ opacity:0; transform:translateY(20px); transition:opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1); }
+  .rv.in{ opacity:1; transform:none; }
+
+  @media (max-width:860px){
+    #bg{ opacity:0.18; }
+    #scrim{ background:var(--paper); opacity:0.6; }
+    .block{ max-width:none; }
+    .block.hero{ min-height:78vh; }
+    p.sub, p.body{ max-width:none; }
+    .who{ max-width:none; }
+    nav.top{ gap:1rem; font-size:12px; }
+  }
+  @media (max-width:560px){
+    #bg{ display:none; }
+    nav.top{ gap:.8rem; font-size:11px; }
+    h1.head{ font-size:clamp(2rem,8.4vw,2.7rem); }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .rv{ opacity:1; transform:none; transition:none; }
+    html{ scroll-behavior:auto; }
+  }
+</style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div id="scrim"></div>
+  <div class="cursor" id="cursor"></div>
+
+  <header>
+    <a class="brand" href="index.html" data-h>Svaiva<sup>®</sup></a>
+    <nav class="top">
+      <a href="index.html" data-h>Offerings</a>
+      <a href="#principles" data-h>Principles</a>
+      <a href="mailto:connect@svaiva.com" data-h>Contact</a>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <!-- ===== HERO ===== -->
+    <section class="block hero">
+      <div class="label rv"><span class="ln"></span><span>Approach</span></div>
+      <h1 class="head rv">Systems that think, decide, and act the way <em>you would</em>.</h1>
+      <p class="sub rv">Not advice you file away. A working reflection of your business — built alongside your current process, measured on outcomes, and shipped in 15-day sprints.</p>
+      <div class="cta-row rv">
+        <a class="lk" href="mailto:connect@svaiva.com?subject=Svaiva%20enquiry" data-h>Reach out <span class="arw">→</span></a>
+        <a class="lk ghost" href="index.html" data-h>See offerings <span class="arw">→</span></a>
+      </div>
+    </section>
+
+    <!-- ===== HOW WE WORK ===== -->
+    <section class="block">
+      <div class="label rv"><span class="ln"></span><span>How we work</span></div>
+      <h2 class="rv">Built in <em>15-day sprints</em>.</h2>
+      <p class="body rv">Every engagement is scoped to a working outcome you can measure — not a deck. We build in parallel with what you run today, so nothing stops. You switch over only when the new version wins.</p>
+    </section>
+
+    <!-- ===== PRINCIPLES ===== -->
+    <section class="block" id="principles">
+      <div class="label rv"><span class="ln"></span><span>What we hold to</span></div>
+      <h2 class="rv">Four things we don't <em>bend</em> on.</h2>
+      <div class="lines">
+        <div class="ln-item rv"><span class="k">01</span><p><b>You own it.</b> The system, the reasoning, the data — yours, not rented back to you.</p></div>
+        <div class="ln-item rv"><span class="k">02</span><p><b>AI-native, not bolt-on.</b> We rebuild the process around AI, not paste AI onto the old one.</p></div>
+        <div class="ln-item rv"><span class="k">03</span><p><b>Measured on outcomes.</b> Value is judged on what changes in the work — not attendance or slideware.</p></div>
+        <div class="ln-item rv"><span class="k">04</span><p><b>Compliant by design.</b> DPDP-aligned, only what's needed held, a private in-country instance when required.</p></div>
+      </div>
+    </section>
+
+    <!-- ===== WHY TRUST US ===== -->
+    <section class="block">
+      <div class="label rv"><span class="ln"></span><span>Why trust us</span></div>
+      <h2 class="rv">Built by <em>finance insiders</em>.</h2>
+      <div class="who">
+        <div class="card rv">
+          <div class="nm">Sankalp <span>· Founder</span></div>
+          <p>A Chartered Accountant who spent five years at EY, built a national-scale AI tax platform, and has trained 200-plus professionals to use AI in real work. Runs a full BRAIN on himself, daily.</p>
+        </div>
+        <div class="card rv">
+          <div class="nm">Ameya Lokhande <span>· Co-founder</span></div>
+          <p>A Chartered Accountant and EY-Parthenon alumnus who leads strategy and operations — PE post-acquisition integrations, restructurings, and capital raises, always working from the operational reality behind the numbers. Has mentored 50-plus CA students through ICAI.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CLOSE ===== -->
+    <section class="block close">
+      <h2 class="rv">Bring us a process worth <em>rebuilding</em>.</h2>
+      <p class="body rv">If one of these fits, tell us the shape of it. We'll tell you honestly whether we're the right team — and what a first sprint would look like.</p>
+      <div class="cta-row rv"><a class="lk" href="mailto:connect@svaiva.com?subject=Svaiva%20enquiry" data-h>Reach out <span class="arw">→</span></a></div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="foot-in">
+      <a href="index.html" data-h>← Back to Svaiva</a>
+      <span class="muted">Svaiva / Approach</span>
+      <a href="offerings/brains.html" data-h>Offerings: BRAINs →</a>
+    </div>
+  </footer>
+
+<script>
+/* ===== CURSOR ===== */
+const cursor=document.getElementById("cursor");
+let mx=innerWidth/2, my=innerHeight/2, cxp=mx, cyp=my;
+addEventListener("mousemove",e=>{ mx=e.clientX; my=e.clientY; });
+document.querySelectorAll("[data-h]").forEach(el=>{
+  el.addEventListener("mouseenter",()=>cursor.classList.add("grow"));
+  el.addEventListener("mouseleave",()=>cursor.classList.remove("grow"));
+});
+(function loop(){ cxp+=(mx-cxp)*0.2; cyp+=(my-cyp)*0.2;
+  cursor.style.transform=`translate(${cxp}px,${cyp}px) translate(-50%,-50%)`; requestAnimationFrame(loop); })();
+
+/* ===== SCROLL REVEAL ===== */
+const io=new IntersectionObserver((es)=>{
+  es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+},{ threshold:0.12, rootMargin:"0px 0px -6% 0px" });
+document.querySelectorAll(".rv").forEach(n=>io.observe(n));
+
+/* ===== ASCII ORB (right-anchored, fixed) ===== */
+const cv=document.getElementById("bg"), ctx=cv.getContext("2d");
+const RAMP=[" ","-","−","=","+","<",">","1","×","÷","%","0","√","$","¥","£","€","∑","∞","₹"];
+const FONT_PX=13; let CW, CH, cols, rows, W, H, dpr;
+function setup(){
+  dpr=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight;
+  cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+"px"; cv.style.height=H+"px";
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.font=`${FONT_PX}px ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace`;
+  ctx.textBaseline="top";
+  CW=ctx.measureText("0").width||7.8; CH=Math.round(FONT_PX*1.16);
+  cols=Math.ceil(W/CW)+1; rows=Math.ceil(H/CH)+1;
+}
+setup(); addEventListener("resize",setup);
+function hash(a,b,c){ let h=(a*374761393+b*668265263+c*362437)>>>0; h=(h^(h>>13))*1274126177>>>0; return (h>>>0)/4294967296; }
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const L=(()=>{ const v=[-0.55,-0.68,0.49]; const m=Math.hypot(...v); return v.map(x=>x/m); })();
+let frame=0, last=0;
+function draw(ts){
+  requestAnimationFrame(draw);
+  if(ts-last<50) return; last=ts; frame++;
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle="rgba(16,24,32,0.045)"; ctx.lineWidth=1;
+  for(let y=Math.round(CH*2)+0.5; y<H; y+=CH*2){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+  const R=Math.min(W,H)*0.42;
+  const cx=W*0.76+Math.sin(ts*0.00040)*W*0.005;
+  const cy=H*0.50+Math.cos(ts*0.00033)*H*0.009;
+  const rad=R*0.52, rad2=rad*rad, MAXO=60;
+  const yaw=ts*0.00019;
+  const pitch=clamp((my-H/2)/H*0.9, -0.7, 0.7) + 0.12;
+  const cosY=Math.cos(yaw), sinY=Math.sin(yaw), cosP=Math.cos(pitch), sinP=Math.sin(pitch);
+  const N=RAMP.length;
+  for(let r=0;r<rows;r++){
+    const y=r*CH; const pcy=y+CH/2;
+    for(let c=0;c<cols;c++){
+      const x=c*CW; const pcx=x+CW/2;
+      const dx=(pcx-cx)/R, dy=(pcy-cy)/R; const r2=dx*dx+dy*dy;
+      let ch=null, alpha=0, ice=false;
+      if(r2<=1){
+        const z=Math.sqrt(1-r2);
+        let b=dx*L[0]+dy*L[1]+z*L[2]; b=Math.max(0,b); b=0.10+0.80*b;
+        let ox=dx*cosY - z*sinY, oz=dx*sinY + z*cosY, oy=dy;
+        const oy2=oy*cosP - oz*sinP; oz=oy*sinP + oz*cosP; oy=oy2;
+        const lon=Math.atan2(ox,oz), lat=Math.asin(clamp(oy,-1,1));
+        b*=0.74 + 0.26*(0.5+0.5*Math.sin(lon*7 + lat*1.5));
+        const wire=Math.pow(Math.abs(Math.sin(lon*8)),26)*0.5 + Math.pow(Math.abs(Math.sin(lat*6)),26)*0.4;
+        b+=wire*0.22; b+=(hash(c,r,frame)-0.5)*0.05; b=Math.min(1,Math.max(0,b));
+        const idx=Math.min(N-1,Math.max(0,Math.round((1-b)*(N-1))));
+        ch=RAMP[idx];
+        if(ch!==" "){ alpha=0.12+0.32*(idx/(N-1)); ice=idx>N*0.72; }
+      } else {
+        if(hash(c,r,(frame>>2))<0.010){ ch=RAMP[2+((c+r)%5)]; alpha=0.05; }
+      }
+      if(ch && ch!==" "){
+        let dX=x, dY=y;
+        const sx=pcx-mx, sy=pcy-my, s2=sx*sx+sy*sy;
+        if(s2<rad2){ const s=Math.sqrt(s2), f=1-s/rad, off=f*f*MAXO, inv=1/(s||1);
+          dX+=sx*inv*off; dY+=sy*inv*off; }
+        ctx.fillStyle = ice ? `rgba(44,118,148,${alpha})` : `rgba(9,15,21,${alpha})`;
+        ctx.fillText(ch,dX,dY);
+      }
+    }
+  }
+}
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>
