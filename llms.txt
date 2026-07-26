@@ -1,0 +1,26 @@
+# Svaiva
+
+> Svaiva builds AI systems that do a firm's work the way it would — decisions, reporting, compliance, operations — shipped in 15-day sprints, and the client owns them. "Sva" (one's own self) + "iva" (as, like) = "as oneself."
+
+Svaiva closes the **execution gap**: businesses already know what needs to be done; they lack the capacity to execute it repeatedly at speed. Svaiva builds the systems that actually do the work — across any function, not just knowledge. Not advice. Not a chatbot you query. A working system that runs a business function the way the firm would.
+
+The name also carries AI at its centre: Sv**AI**va. The brand's literal meaning, "a digital reflection," is the working system that mirrors the firm's own judgment and acts on it.
+
+Named enemy: consulting fatigue — long projects, open-ended advice, no execution. The counter: outcomes not reports, 15-day sprints, success-fee pricing, capability transferred in-house, and the client owns what gets built.
+
+## Core pages
+- [What we do (home)](https://svaiva.com/): What Svaiva is, the sva+iva meaning, and the six offerings.
+- [Approach](https://svaiva.com/approach.html): How Svaiva works — AI-native systems built and shipped in 15-day sprints, measured on outcomes. Built by finance insiders.
+- [The name — reflection](https://svaiva.com/reflection.html): Sva — one's own self. Svaiva is that self turned into a working reflection, with AI at the centre of the name.
+
+## Offerings
+- [BRAINs](https://svaiva.com/offerings/brains.html): A private AI that learns how your experts reason and handles new cases the way they would — and you own it.
+- [Recall](https://svaiva.com/offerings/recall.html): One place to ask across everything your firm knows — cited answers you can trust, accuracy first.
+- [AI-Native Build](https://svaiva.com/offerings/ai-native.html): We build your AI-native alternative alongside the current one, so nothing stops while the better version comes up.
+- [Training](https://svaiva.com/offerings/training.html): Role-specific AI programs for finance, ops, and consulting — measured on what changes in practice, not attendance.
+- [Succession](https://svaiva.com/offerings/succession.html): A transfer engine that captures what each person knows and forces it into practice before they leave.
+- [Education](https://svaiva.com/offerings/education.html): Answer sheets scored with gates, marked-up scripts, and coaching — examiner-grade marking, consistent, fast, and fair.
+
+## Contact
+- Email: connect@svaiva.com
+- Serves: firms in India (finance, professional services, operations, education).
