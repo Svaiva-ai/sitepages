@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Svaiva · The name, and what a reflection means</title>
+<meta name="description" content="Sva — one's own self. Svaiva is that self turned into a working reflection, with AI at the centre of the name." />
+<style>
+  /* ================= FONTS ================= */
+  @font-face{ font-family:"Hanken Grotesk"; font-style:normal; font-weight:400 800;
+    font-display:swap; src:url("./design-system/fonts/hanken-grotesk.woff2") format("woff2"); }
+  @font-face{ font-family:"Fraunces"; font-style:italic; font-weight:300 700;
+    font-display:swap; src:url("./design-system/fonts/fraunces-italic.woff2") format("woff2"); }
+
+  /* ================= TOKENS (house — matched to index.html) ================= */
+  :root{
+    --paper:#e0e9f0; --ink:#0e151c; --mute:#68727d; --faint:#a3aeb8;
+    --line:rgba(14,21,28,0.11); --accent:#2c86a6;
+    --grot:"Hanken Grotesk", system-ui, -apple-system, sans-serif;
+    --serif:"Fraunces", Georgia, serif;
+    --gut:clamp(20px,5vw,72px);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html,body{ min-height:100%; }
+  body{ background:var(--paper); color:var(--ink); font-family:var(--grot); font-weight:400;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  @media (hover:hover) and (pointer:fine){ body{ cursor:none; } a,button{ cursor:none; } }
+
+  #bg{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+  .cursor{ position:fixed; top:0; left:0; width:14px; height:14px; border-radius:50%;
+    background:var(--ink); z-index:9999; pointer-events:none; transform:translate(-50%,-50%);
+    transition:width .22s cubic-bezier(.2,.7,.2,1), height .22s cubic-bezier(.2,.7,.2,1); }
+  .cursor.grow{ width:68px; height:68px; background:transparent; border:1px solid var(--ink); }
+  @media (hover:none),(pointer:coarse){ .cursor{ display:none; } }
+
+  /* ================= LAYOUT ================= */
+  .wrap{ position:relative; z-index:5; min-height:100vh; display:flex; flex-direction:column;
+    padding:0 var(--gut); }
+  header{ display:flex; align-items:center; justify-content:space-between; height:74px; font-size:12.5px; }
+  .brand{ font-weight:600; letter-spacing:-0.01em; font-size:16px; display:flex; align-items:baseline; gap:2px;
+    color:var(--ink); text-decoration:none; }
+  .brand sup{ color:var(--accent); font-size:9px; }
+  nav.top{ display:flex; gap:1.8rem; }
+  nav.top a{ color:var(--ink); text-decoration:none; position:relative; }
+  nav.top a::after{ content:""; position:absolute; left:0; right:100%; bottom:-3px; height:1px;
+    background:var(--accent); transition:right .3s cubic-bezier(.2,.7,.2,1); }
+  nav.top a:hover::after{ right:0; }
+
+  main{ flex:1; display:flex; flex-direction:column; justify-content:center;
+    max-width:60ch; padding:8vh 0 6vh; }
+  .kicker{ display:flex; align-items:center; gap:.8rem; font-size:11px; letter-spacing:0.2em;
+    text-transform:uppercase; color:var(--mute); margin-bottom:1.8rem; }
+  .kicker .ln{ width:38px; height:1px; background:var(--ink); opacity:.35; }
+
+  h1.head{ font-family:var(--grot); font-weight:750; font-size:clamp(2.2rem,5.4vw,4.4rem);
+    line-height:1.0; letter-spacing:-0.026em; max-width:16ch; }
+  h1.head em{ font-family:var(--serif); font-style:italic; font-weight:400; letter-spacing:-0.01em; }
+  /* the AI hidden in the name — Brand Kit p7: highlight AI in a different colour */
+  .ai{ color:var(--accent); font-style:normal; }
+
+  .lead{ margin-top:1.8rem; font-size:clamp(1.05rem,1.6vw,1.32rem); line-height:1.5; color:#2b343d;
+    max-width:46ch; font-weight:440; }
+  .lead .sva{ font-family:var(--serif); font-style:italic; }
+
+  .block{ margin-top:3.2rem; max-width:52ch; }
+  .label{ font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent);
+    margin-bottom:.9rem; display:flex; align-items:center; gap:.7rem; }
+  .label .ln{ width:26px; height:1px; background:var(--accent); opacity:.5; }
+  .block p{ font-size:clamp(1rem,1.35vw,1.16rem); line-height:1.6; color:#39424b; }
+  .block p + p{ margin-top:.9rem; }
+  .block p em{ font-family:var(--serif); font-style:italic; color:var(--ink); }
+  .block strong{ font-weight:650; color:var(--ink); }
+
+  .links{ display:flex; gap:2.4rem; margin-top:3.4rem; font-size:14px; }
+  .lk{ color:var(--ink); text-decoration:none; position:relative; padding-bottom:4px; font-weight:500; }
+  .lk .arw{ display:inline-block; transition:transform .25s cubic-bezier(.2,.7,.2,1); }
+  .lk:hover .arw{ transform:translateX(6px); }
+  .lk.back:hover .arw{ transform:translateX(-6px); }
+  .lk::after{ content:""; position:absolute; left:0; bottom:0; width:100%; height:1px;
+    background:var(--ink); transition:transform .3s; }
+  .lk.ghost::after{ background:var(--faint); }
+
+  .foot{ display:flex; justify-content:space-between; height:40px; align-items:center;
+    font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--faint);
+    border-top:1px solid var(--line); }
+
+  /* the double-underline treatment his annotation calls for: a word that links to this page.
+     defined here so wiring the homepage later is a one-class change. */
+  .uline{ color:inherit; text-decoration:none; border-bottom:3px double var(--accent);
+    padding-bottom:1px; }
+
+  .rv{ opacity:0; transform:translateY(16px); animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+  .rv:nth-child(2){ animation-delay:.06s; } .rv:nth-child(3){ animation-delay:.12s; }
+  @keyframes rise{ to{ opacity:1; transform:none; } }
+
+  @media (max-width:820px){ #bg{ opacity:0.16; } main{ padding:12vh 0 6vh; } }
+  @media (max-width:560px){ #bg{ display:none; } h1.head{ font-size:clamp(2rem,9vw,2.7rem); } .links{ gap:1.4rem; } }
+  @media (prefers-reduced-motion: reduce){
+    .rv{ animation:none; opacity:1; transform:none; }
+    .cursor{ transition:none; }
+  }
+</style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <div class="cursor" id="cursor"></div>
+
+  <div class="wrap">
+    <header>
+      <a class="brand" href="index.html" data-h>Svaiva<sup>®</sup></a>
+      <nav class="top">
+        <a href="index.html" data-h>What we do</a>
+        <a href="approach.html" data-h>Why we do it</a>
+        <a href="mailto:connect@svaiva.com" data-h>Want to do it?</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="kicker rv"><span class="ln"></span><span>The name · a reflection</span></div>
+
+      <h1 class="head rv">Svaiva is a reflection of your <em>self</em>.</h1>
+
+      <p class="lead rv">
+        <span class="sva">Sva</span> — one's own, the self. <span class="sva">Iva</span> — like, as.
+        <strong>Svaiva</strong>: <em>like your own self</em> — a working reflection of you.
+        And the name holds it too — Sv<span class="ai">AI</span>va, with <span class="ai">AI</span> at the centre.
+      </p>
+
+      <div class="block rv">
+        <div class="label"><span class="ln"></span>What we mean by a reflection</div>
+        <p>A reflection is a working copy of how your firm thinks. It learns how your people
+           <em>reason</em>, then decides and acts the way they would — fast, sourced, and yours to own.</p>
+        <p>Not advice. Not a chatbot you query. A system that mirrors your judgment and does the work.</p>
+      </div>
+
+      <div class="block rv">
+        <div class="label"><span class="ln"></span>Six reflections</div>
+        <p>Every offering is one kind of reflection — of an expert's judgment, of the firm's memory,
+           of an entire process. Same idea, pointed at a different part of your business.</p>
+      </div>
+
+      <div class="links rv">
+        <a class="lk" href="mailto:connect@svaiva.com?subject=Book%20a%20sprint" data-h>Book a sprint <span class="arw">→</span></a>
+        <a class="lk ghost back" href="index.html" data-h><span class="arw">←</span> Back home</a>
+      </div>
+    </main>
+
+    <div class="foot">
+      <span>SVAIVA / DIGITAL REFLECTIONS</span>
+      <span>SVA · THE SELF, MIRRORED</span>
+    </div>
+  </div>
+
+<script>
+  const $=s=>document.querySelector(s);
+  const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ============ CURSOR ============ */
+  const cursor=$("#cursor");
+  let mx=innerWidth/2, my=innerHeight/2, cxp=mx, cyp=my;
+  addEventListener("mousemove",e=>{ mx=e.clientX; my=e.clientY; });
+  document.querySelectorAll("[data-h]").forEach(el=>{
+    el.addEventListener("mouseenter",()=>cursor.classList.add("grow"));
+    el.addEventListener("mouseleave",()=>cursor.classList.remove("grow"));
+  });
+  (function loop(){ cxp+=(mx-cxp)*0.2; cyp+=(my-cyp)*0.2;
+    cursor.style.transform=`translate(${cxp-7}px,${cyp-7}px)`; requestAnimationFrame(loop); })();
+
+  /* ============ ASCII ORB (reused from index.html; degrades to one static frame) ============ */
+  const cv=$("#bg"), ctx=cv.getContext("2d");
+  const RAMP=[" ","-","−","=","+","<",">","1","×","÷","%","0","√","$","¥","£","€","∑","∞","₹"];
+  const FONT_PX=13; let CW, CH, cols, rows, W, H, dpr;
+  function setup(){
+    dpr=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight;
+    cv.width=W*dpr; cv.height=H*dpr; cv.style.width=W+"px"; cv.style.height=H+"px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.font=`${FONT_PX}px ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace`;
+    ctx.textBaseline="top";
+    CW=ctx.measureText("0").width||7.8; CH=Math.round(FONT_PX*1.16);
+    cols=Math.ceil(W/CW)+1; rows=Math.ceil(H/CH)+1;
+  }
+  setup(); addEventListener("resize",()=>{ setup(); if(REDUCE) draw(performance.now()); });
+  function hash(a,b,c){ let h=(a*374761393+b*668265263+c*362437)>>>0; h=(h^(h>>13))*1274126177>>>0; return (h>>>0)/4294967296; }
+  const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+  const L=(()=>{ const v=[-0.55,-0.68,0.49]; const m=Math.hypot(...v); return v.map(x=>x/m); })();
+  let frame=0, last=0;
+  function draw(ts){
+    if(!REDUCE) requestAnimationFrame(draw);
+    if(ts-last<50 && !REDUCE) return; last=ts; frame++;
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle="rgba(16,24,32,0.045)"; ctx.lineWidth=1;
+    for(let y=Math.round(CH*2)+0.5; y<H; y+=CH*2){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    ctx.strokeStyle="rgba(16,24,32,0.06)";
+    const gx=Math.round(W*0.5)+0.5; ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,H); ctx.stroke();
+    const R=Math.min(W,H)*0.46;
+    const cx = W*0.74 + Math.sin(ts*0.00040)*W*0.006;
+    const cy = H*0.50 + Math.cos(ts*0.00033)*H*0.010;
+    const rad=R*0.52, rad2=rad*rad, MAXO=60;
+    const yaw=ts*0.00019;
+    const pitch=clamp((my-H/2)/H*0.9, -0.7, 0.7) + 0.12;
+    const cosY=Math.cos(yaw), sinY=Math.sin(yaw), cosP=Math.cos(pitch), sinP=Math.sin(pitch);
+    const N=RAMP.length;
+    for(let r=0;r<rows;r++){
+      const y=r*CH; const pcy=y+CH/2;
+      for(let c=0;c<cols;c++){
+        const x=c*CW; const pcx=x+CW/2;
+        const dx=(pcx-cx)/R, dy=(pcy-cy)/R; const r2=dx*dx+dy*dy;
+        let ch=null, alpha=0, ice=false;
+        if(r2<=1){
+          const z=Math.sqrt(1-r2);
+          let b=dx*L[0]+dy*L[1]+z*L[2]; b=Math.max(0,b); b=0.10+0.80*b;
+          let ox=dx*cosY - z*sinY, oz=dx*sinY + z*cosY, oy=dy;
+          const oy2=oy*cosP - oz*sinP; oz=oy*sinP + oz*cosP; oy=oy2;
+          const lon=Math.atan2(ox,oz), lat=Math.asin(clamp(oy,-1,1));
+          b*=0.74 + 0.26*(0.5+0.5*Math.sin(lon*7 + lat*1.5));
+          const wire=Math.pow(Math.abs(Math.sin(lon*8)),26)*0.5 + Math.pow(Math.abs(Math.sin(lat*6)),26)*0.4;
+          b+=wire*0.22; b+=(hash(c,r,frame)-0.5)*0.05; b=Math.min(1,Math.max(0,b));
+          const idx=Math.min(N-1,Math.max(0,Math.round((1-b)*(N-1))));
+          ch=RAMP[idx];
+          if(ch!==" "){ alpha=0.13+0.34*(idx/(N-1)); ice=idx>N*0.72; }
+        } else {
+          if(hash(c,r,(frame>>2))<0.010){ ch=RAMP[2+((c+r)%5)]; alpha=0.055; }
+        }
+        if(ch && ch!==" "){
+          let dX=x, dY=y;
+          const sx=pcx-mx, sy=pcy-my, s2=sx*sx+sy*sy;
+          if(s2<rad2){ const s=Math.sqrt(s2), f=1-s/rad, off=f*f*MAXO, inv=1/(s||1); dX+=sx*inv*off; dY+=sy*inv*off; }
+          ctx.fillStyle = ice ? `rgba(44,118,148,${alpha})` : `rgba(9,15,21,${alpha})`;
+          ctx.fillText(ch,dX,dY);
+        }
+      }
+    }
+  }
+  requestAnimationFrame(draw);
+</script>
+</body>
+</html>
